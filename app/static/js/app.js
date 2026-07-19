@@ -29,7 +29,7 @@ document.addEventListener('alpine:init', () => {
             this.checkUrlForChat();
             this.setupCopyButtons();
             document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && !e.target.closest('.sidebar') && !e.target.closest('.menu-toggle')) {
+                if (window.innerWidth <= 768 && !e.target.closest('.sidebar') && !e.target.closest('header button')) {
                     this.sidebarOpen = false;
                 }
             });
@@ -220,7 +220,7 @@ document.addEventListener('alpine:init', () => {
                             try {
                                 const data = JSON.parse(part.slice(6));
                                 this.appendResponse(data, msgIdx, currentEvent);
-                            } catch (e) { /* skip parse errors */ }
+                            } catch (e) { }
                             currentEvent = '';
                         }
                     }
@@ -405,11 +405,11 @@ document.addEventListener('alpine:init', () => {
 
                 if (ulMatch) {
                     if (inOl) { out.push('</ol>'); inOl = false; }
-                    if (!inUl) { out.push('<ul class="list-disc">'); inUl = true; }
+                    if (!inUl) { out.push('<ul>'); inUl = true; }
                     out.push('<li>' + ulMatch[1] + '</li>');
                 } else if (olMatch) {
                     if (inUl) { out.push('</ul>'); inUl = false; }
-                    if (!inOl) { out.push('<ol class="list-decimal">'); inOl = true; }
+                    if (!inOl) { out.push('<ol>'); inOl = true; }
                     out.push('<li>' + olMatch[1] + '</li>');
                 } else {
                     if (inUl) { out.push('</ul>'); inUl = false; }

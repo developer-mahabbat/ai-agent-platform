@@ -3,135 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MKCode</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>MKCode — AI Agent Platform</title>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/app.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        surface: '#FAFAFA',
-                        panel: '#F8F6FF',
-                        border: '#E5E5E5',
-                        'border-hover': '#d4cce0',
-                        primary: '#8B5CF6',
-                        'primary-dim': '#7C3AED',
-                        muted: '#888',
-                        'muted-light': '#444',
-                        'accent-light': '#F3EEFF',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                },
-            },
-        };
-    </script>
 </head>
-<body class="h-dvh bg-gradient-app text-[#1A1A1A] font-sans antialiased overflow-hidden" x-data="chatApp">
+<body class="bg-deep text-primary antialiased" x-data="chatApp">
 
-    <!-- Source Popup Modal -->
-    <div x-show="showSourcesModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center" x-cloak>
-        <div class="fixed inset-0 bg-black/20 backdrop-blur-sm" @click="closeSources()"></div>
-        <div class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-xl max-h-[80vh] sm:max-h-[70vh] overflow-hidden flex flex-col z-10" x-show="showSourcesModal" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
-            <div class="flex items-center justify-between px-5 py-4 border-b border-[#E5E5E5] shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <span class="text-sm font-semibold text-[#1A1A1A]">Sources</span>
-                    <span class="text-xs text-[#888]" x-text="'(' + activeSources.length + ')'"></span>
+    <!-- Source Popup -->
+    <div x-show="showSourcesModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-md" @click="closeSources()"></div>
+        <div class="relative w-full sm:max-w-lg max-h-[85vh] sm:max-h-[75vh] bg-elevated border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden z-10"
+             x-transition:enter="transition ease-out duration-250" x-transition:enter-start="opacity-0 translate-y-6 sm:translate-y-4 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-accent"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+                    <span class="font-semibold">Sources</span>
+                    <span class="text-sm text-muted" x-text="`(${activeSources.length})`"></span>
                 </div>
-                <button class="p-1.5 rounded-lg text-[#888] hover:text-[#444] hover:bg-gray-100 transition-colors" @click="closeSources()">
+                <button class="w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-primary hover:bg-white/5 transition-colors" @click="closeSources()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto scrollbar-thin p-4 space-y-2">
+            <div class="flex-1 overflow-y-auto p-3 space-y-2">
                 <template x-for="(src, i) in activeSources" :key="i">
-                    <a :href="src.url" target="_blank" rel="noopener noreferrer" class="flex gap-3 p-3.5 rounded-xl border border-[#E5E5E5] hover:border-[#8B5CF6]/30 hover:bg-[#F8F6FF] transition-all group">
-                        <div class="w-8 h-8 rounded-lg bg-[#F3EEFF] shrink-0 flex items-center justify-center text-xs font-bold text-[#888] overflow-hidden">
+                    <a :href="src.url" target="_blank" rel="noopener noreferrer" class="flex items-start gap-3 p-3.5 rounded-xl border border-border hover:border-accent/30 hover:bg-accent-subtle/30 transition-all duration-200 group">
+                        <div class="w-8 h-8 rounded-lg bg-surface shrink-0 flex items-center justify-center overflow-hidden border border-border">
                             <img :src="'https://www.google.com/s2/favicons?domain=' + getDomain(src.url) + '&sz=64'" :alt="getDomain(src.url)" class="w-5 h-5" loading="lazy" @error="$el.style.display='none'">
                         </div>
                         <div class="min-w-0 flex-1">
-                            <div class="text-sm font-medium text-[#1A1A1A] truncate group-hover:text-[#8B5CF6] transition-colors" x-text="src.title"></div>
-                            <div class="text-xs text-[#888] truncate mt-0.5" x-text="getDomain(src.url)"></div>
-                            <div class="text-xs text-[#888] mt-1 line-clamp-2" x-text="src.snippet"></div>
+                            <div class="text-sm font-medium truncate group-hover:text-accent transition-colors" x-text="src.title"></div>
+                            <div class="text-xs text-muted truncate mt-0.5" x-text="getDomain(src.url)"></div>
+                            <div class="text-xs text-muted mt-1 line-clamp-2" x-text="src.snippet"></div>
                         </div>
-                        <svg class="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-[#888]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        <svg class="shrink-0 mt-1 text-muted opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
                 </template>
-                <p x-show="activeSources.length === 0" class="text-sm text-[#888] text-center py-8">No sources available</p>
+                <p x-show="activeSources.length === 0" class="text-sm text-muted text-center py-10">No sources available</p>
             </div>
         </div>
     </div>
 
     <!-- Auth Screen -->
-    <div x-show="showAuth" class="fixed inset-0 z-40 bg-gradient-app flex items-center justify-center p-6" x-cloak>
-        <div class="w-full max-w-sm mx-auto">
-            <!-- Skeleton -->
+    <div x-show="showAuth" class="fixed inset-0 z-40 flex items-center justify-center p-4" x-cloak>
+        <div class="absolute inset-0 bg-deep">
+            <div class="absolute inset-0 bg-gradient-radial from-accent/[0.04] to-transparent"></div>
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[120px]"></div>
+        </div>
+        <div class="relative w-full max-w-sm">
             <template x-if="authLoading">
                 <div class="text-center">
-                    <div class="skeleton-box w-12 h-12 rounded-xl mx-auto mb-5"></div>
-                    <div class="skeleton-box h-7 w-[55%] mx-auto mb-2 rounded-lg"></div>
-                    <div class="skeleton-box h-3.5 w-[35%] mx-auto mb-8 rounded-md"></div>
-                    <div class="skeleton-box h-11 w-full mb-3.5 rounded-xl"></div>
-                    <div class="skeleton-box h-11 w-full mb-3.5 rounded-xl"></div>
-                    <div class="skeleton-box h-12 w-full mt-1 rounded-xl"></div>
+                    <div class="skeleton w-14 h-14 rounded-2xl mx-auto mb-6"></div>
+                    <div class="skeleton h-8 w-3/5 mx-auto mb-3 rounded-lg"></div>
+                    <div class="skeleton h-4 w-2/5 mx-auto mb-10 rounded-md"></div>
+                    <div class="skeleton h-12 w-full mb-3 rounded-xl"></div>
+                    <div class="skeleton h-12 w-full mb-3 rounded-xl"></div>
+                    <div class="skeleton h-12 w-full rounded-xl"></div>
                 </div>
             </template>
-
-            <!-- Auth Form -->
             <template x-if="!authLoading">
-                <div class="fade-in text-center">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-[rgba(139,92,246,0.3)] mx-auto mb-5">Mk</div>
-                    <h1 class="text-[26px] font-bold tracking-[-0.03em] text-[#1A1A1A] mb-1">Welcome back</h1>
-                    <p class="text-sm text-[#888] mb-8">Sign in to continue to MKCode</p>
-
-                    <!-- OAuth Buttons -->
+                <div class="auth-card text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-accent/30 mx-auto mb-6 animate-float">Mk</div>
+                    <h1 class="text-2xl font-bold tracking-tight mb-1.5">Welcome back</h1>
+                    <p class="text-sm text-muted mb-8">Sign in to continue to MKCode</p>
                     <div class="space-y-3 mb-6">
                         <button class="oauth-btn">
                             <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                             Continue with Google
                         </button>
                         <button class="oauth-btn">
-                            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#333" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58 0-.28-.01-1.04-.02-2.05-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.49 1 .1-.78.42-1.31.76-1.61-2.66-.3-5.46-1.33-5.46-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23.96-.27 1.98-.4 3-.41 1.02.01 2.04.14 3 .41 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22 0 1.61-.01 2.9-.01 3.3 0 .32.22.7.84.57C20.57 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58 0-.28-.01-1.04-.02-2.05-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.49 1 .1-.78.42-1.31.76-1.61-2.66-.3-5.46-1.33-5.46-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23.96-.27 1.98-.4 3-.41 1.02.01 2.04.14 3 .41 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22 0 1.61-.01 2.9-.01 3.3 0 .32.22.7.84.57C20.57 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/></svg>
                             Continue with GitHub
                         </button>
                     </div>
-
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="flex-1 h-px bg-[#E5E5E5]"></div>
-                        <span class="text-sm text-[#888] font-medium">or</span>
-                        <div class="flex-1 h-px bg-[#E5E5E5]"></div>
+                        <div class="flex-1 h-px bg-border"></div>
+                        <span class="text-sm text-muted font-medium">or</span>
+                        <div class="flex-1 h-px bg-border"></div>
                     </div>
-
-                    <div class="space-y-3.5">
+                    <div class="space-y-4">
                         <div class="text-left">
-                            <label class="text-sm font-semibold text-[#444] mb-1.5 block">Email</label>
+                            <label class="text-sm font-medium text-secondary mb-1.5 block">Email</label>
                             <input type="email" class="input-field" placeholder="m@example.com" x-model="authEmail" :class="{ 'error': authError }">
                         </div>
                         <div class="text-left">
-                            <label class="text-sm font-semibold text-[#444] mb-1.5 block">Password</label>
+                            <label class="text-sm font-medium text-secondary mb-1.5 block">Password</label>
                             <input type="password" class="input-field" placeholder="Enter your password" x-model="authPassword" :class="{ 'error': authError }">
                         </div>
                     </div>
-
-                    <div class="flex justify-end mt-2 mb-5">
-                        <button class="text-sm font-semibold text-[#8B5CF6] hover:text-[#7C3AED] transition-colors bg-transparent border-none cursor-pointer">Forgot password?</button>
+                    <div class="flex justify-end mt-2 mb-6">
+                        <button class="text-sm font-medium text-accent hover:text-accent-light transition-colors bg-transparent border-none cursor-pointer">Forgot password?</button>
                     </div>
-
                     <button class="btn-primary w-full flex items-center justify-center gap-2" :disabled="!authEmail || !authPassword">
-                        <span x-show="authSubmitting" class="spinner spinner-white"></span>
+                        <span x-show="authSubmitting" class="spinner-sm spinner-white"></span>
                         <span x-text="authSubmitting ? 'Signing in...' : 'Sign in'"></span>
                     </button>
-
-                    <p class="text-sm text-[#888] mt-6">
+                    <p class="text-sm text-muted mt-6">
                         Don't have an account?
-                        <button class="font-semibold text-[#8B5CF6] hover:text-[#7C3AED] transition-colors bg-transparent border-none cursor-pointer">Sign up</button>
+                        <button class="font-medium text-accent hover:text-accent-light transition-colors bg-transparent border-none cursor-pointer">Sign up</button>
                     </p>
                 </div>
             </template>
@@ -139,287 +112,305 @@
     </div>
 
     <!-- Sidebar Overlay -->
-    <div x-show="sidebarOpen" class="fixed inset-0 bg-black/10 z-20 md:hidden backdrop-blur-sm" @click="sidebarOpen = false"></div>
+    <div x-show="sidebarOpen" class="fixed inset-0 bg-black/40 z-20 md:hidden backdrop-blur-sm" @click="sidebarOpen = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"></div>
 
-    <!-- Sidebar -->
-    <aside class="w-[80vw] max-w-[18rem] md:w-72 md:min-w-[18rem] glass-sidebar flex flex-col z-30 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] fixed md:relative inset-y-0 left-0 shadow-xl md:shadow-none"
-           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
-        <div class="flex items-center justify-between px-4 h-14 border-b border-[#E5E5E5]/50 shrink-0">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center text-xs font-bold text-white shadow-sm shadow-[rgba(139,92,246,0.3)]">Mk</div>
-                <span class="text-base font-semibold tracking-tight text-[#1A1A1A]">MKCode</span>
-            </div>
-            <button class="md:hidden p-2 rounded-xl text-[#888] hover:text-[#444] hover:bg-[#F3EEFF] transition-colors" @click="sidebarOpen = false">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-        </div>
+    <!-- App Layout -->
+    <div class="flex h-dvh w-full overflow-hidden">
 
-        <div class="p-3">
-            <button class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#444] bg-white border border-[#E5E5E5] hover:border-[#8B5CF6]/30 hover:text-[#8B5CF6] hover:bg-[#F8F6FF] transition-all shadow-sm" @click="newChat">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New chat
-            </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto px-2 space-y-0.5 scrollbar-thin">
-            <template x-for="chat in chats" :key="chat.id">
-                <div class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl cursor-pointer text-sm text-[#888] hover:text-[#1A1A1A] hover:bg-white/70 transition-colors border border-transparent hover:border-[#E5E5E5] group"
-                     :class="{ 'bg-white/80 border-[#E5E5E5] shadow-sm text-[#1A1A1A]': chat.id === currentChatId }"
-                     @click="selectChat(chat.id)">
-                    <svg class="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span class="truncate flex-1" x-text="chat.title || 'New chat'"></span>
-                    <button class="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#888] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-all" @click.stop="deleteChat(chat.id, $event)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-                    </button>
+        <!-- Sidebar -->
+        <aside class="sidebar w-[280px] min-w-[280px] flex flex-col z-30 fixed md:relative inset-y-0 left-0 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] md:translate-x-0 shadow-2xl md:shadow-none"
+               :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+            <div class="flex items-center justify-between px-4 h-14 shrink-0 border-b border-border/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center text-xs font-bold text-white shadow-sm shadow-accent/30">Mk</div>
+                    <span class="font-semibold tracking-tight text-gradient-brand">MKCode</span>
                 </div>
-            </template>
-        </div>
-
-        <div class="px-4 py-3.5 border-t border-[#E5E5E5]/50 flex items-center gap-2 text-xs text-[#888] shrink-0">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
-            MKCode v1
-        </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 flex flex-col min-w-0 bg-transparent">
-        <!-- Header -->
-        <header class="h-14 border-b border-[#E5E5E5]/50 bg-white/40 backdrop-blur-md flex items-center justify-between px-4 shrink-0 sticky top-0 z-10">
-            <div class="flex items-center gap-3">
-                <button class="md:hidden p-2 rounded-xl text-[#888] hover:text-[#444] hover:bg-[#F3EEFF] transition-colors" @click="sidebarOpen = true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
-                <div class="flex items-center gap-2" x-show="currentChatId">
-                    <span class="text-xs font-medium text-[#888]" x-text="model"></span>
-                    <span class="text-[#E5E5E5]">·</span>
-                    <span class="text-xs text-[#888]" x-text="messages.length + ' messages'"></span>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="hidden md:flex p-2 rounded-xl text-[#888] hover:text-[#444] hover:bg-[#F3EEFF] transition-colors" @click="sidebarOpen = !sidebarOpen">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                <button class="md:hidden w-8 h-8 rounded-xl flex items-center justify-center text-muted hover:text-primary hover:bg-white/5 transition-colors" @click="sidebarOpen = false">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-        </header>
 
-        <!-- Messages -->
-        <div class="flex-1 overflow-y-auto scrollbar-thin" x-ref="chatContainer" @click="if(window.innerWidth <= 768) sidebarOpen = false">
-            <div class="max-w-3xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+            <div class="p-3">
+                <button class="new-chat-btn" @click="newChat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    New chat
+                </button>
+            </div>
 
-                <!-- Welcome -->
-                <div x-show="!currentChatId && messages.length === 0" class="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-[rgba(139,92,246,0.25)] mb-5">Mk</div>
-                    <h1 class="text-2xl sm:text-3xl font-bold tracking-[-0.03em] text-[#1A1A1A] mb-1">MKCode</h1>
-                    <p class="text-sm text-[#888] mb-8">AI Agent Platform</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full max-w-lg">
-                        <button class="welcome-card text-left px-4 py-3.5 rounded-xl bg-white hover:bg-[#F8F6FF] transition-all text-sm text-[#888] hover:text-[#1A1A1A] shadow-sm" @click="selectSuggestion('Build a React todo app with dark mode and local storage')">
-                            <span class="block mb-2 text-[#8B5CF6]">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                            </span>
-                            Build a React app
-                        </button>
-                        <button class="welcome-card text-left px-4 py-3.5 rounded-xl bg-white hover:bg-[#F8F6FF] transition-all text-sm text-[#888] hover:text-[#1A1A1A] shadow-sm" @click="selectSuggestion('Latest AI agent frameworks 2026')">
-                            <span class="block mb-2 text-[#8B5CF6]">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                            </span>
-                            Research AI frameworks
-                        </button>
-                        <button class="welcome-card text-left px-4 py-3.5 rounded-xl bg-white hover:bg-[#F8F6FF] transition-all text-sm text-[#888] hover:text-[#1A1A1A] shadow-sm" @click="selectSuggestion('Create a FastAPI backend with async endpoints')">
-                            <span class="block mb-2 text-[#8B5CF6]">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                            </span>
-                            FastAPI backend
-                        </button>
-                        <button class="welcome-card text-left px-4 py-3.5 rounded-xl bg-white hover:bg-[#F8F6FF] transition-all text-sm text-[#888] hover:text-[#1A1A1A] shadow-sm" @click="selectSuggestion('Explain and implement quicksort')">
-                            <span class="block mb-2 text-[#8B5CF6]">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                            </span>
-                            Algorithm
+            <div class="flex-1 overflow-y-auto px-2 space-y-0.5 sidebar-chats">
+                <template x-for="chat in chats" :key="chat.id">
+                    <div class="chat-item group"
+                         :class="{ 'active': chat.id === currentChatId }"
+                         @click="selectChat(chat.id)">
+                        <svg class="shrink-0 text-muted/60" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span class="truncate flex-1 text-sm" x-text="chat.title || 'New chat'"></span>
+                        <button class="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-muted hover:text-red-400 hover:bg-red-500/10 transition-all" @click.stop="deleteChat(chat.id, $event)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                         </button>
                     </div>
+                </template>
+                <div x-show="chats.length === 0" class="text-center py-10">
+                    <p class="text-sm text-muted">No conversations yet</p>
                 </div>
+            </div>
 
-                <!-- Messages -->
-                <template x-for="(msg, i) in messages" :key="msg.id">
-                    <div class="mb-5 last:mb-0" x-data="{ show: false }" x-init="setTimeout(() => show = true, 10)">
-                        <div class="flex gap-3 items-start" :class="msg.role === 'user' ? 'flex-row-reverse' : ''" x-show="show" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
-                            <!-- Avatar -->
-                            <div class="w-8 h-8 rounded-xl shrink-0 mt-0.5 flex items-center justify-center text-xs font-semibold shadow-sm"
-                                 :class="msg.role === 'user' ? 'bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white shadow-[rgba(139,92,246,0.15)]' : 'bg-[#F3EEFF] text-[#7C3AED]'"
-                                 x-text="msg.role === 'user' ? 'U' : 'Mk'"></div>
+            <div class="px-4 py-3.5 border-t border-border/50 flex items-center gap-2.5 shrink-0">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30"></div>
+                <span class="text-xs text-muted">MKCode v1.0</span>
+            </div>
+        </aside>
 
-                            <!-- Bubble -->
-                            <div class="min-w-0 max-w-[88%] sm:max-w-[78%]"
-                                 :class="msg.role === 'user' ? '' : 'w-full'">
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col min-w-0 relative">
+            <div class="absolute inset-0 bg-gradient-radial from-accent/[0.02] via-transparent to-transparent pointer-events-none"></div>
+            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent/3 rounded-full blur-[150px] pointer-events-none"></div>
 
-                                <!-- Thinking block -->
-                                <template x-if="msg.role === 'assistant' && i === messages.length - 1">
-                                    <div x-show="isThinking && thinkingContent" class="thinking-block mb-3">
-                                        <div class="thinking-header">
-                                            <div class="flex items-center gap-2 flex-1">
-                                                <div class="thinking-dots">
-                                                    <span class="thinking-dot"></span>
-                                                    <span class="thinking-dot"></span>
-                                                    <span class="thinking-dot"></span>
+            <!-- Header -->
+            <header class="h-14 border-b border-border/50 flex items-center justify-between px-4 shrink-0 sticky top-0 z-10 bg-surface/60 backdrop-blur-xl">
+                <div class="flex items-center gap-3">
+                    <button class="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:text-primary hover:bg-white/5 transition-colors" @click="sidebarOpen = true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <div x-show="currentChatId" class="flex items-center gap-2 animate-fade-in">
+                        <span class="text-xs text-muted" x-text="model"></span>
+                        <span class="w-1 h-1 rounded-full bg-border"></span>
+                        <span class="text-xs text-muted" x-text="messages.length + ' messages'"></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button class="hidden md:flex w-9 h-9 rounded-xl items-center justify-center text-muted hover:text-primary hover:bg-white/5 transition-colors" @click="sidebarOpen = !sidebarOpen">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            <div class="flex-1 overflow-y-auto msg-container" x-ref="chatContainer">
+                <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+                    <!-- Welcome -->
+                    <div x-show="!currentChatId && messages.length === 0" class="flex flex-col items-center justify-center min-h-[65vh] text-center px-4 animate-fade-in">
+                        <div class="relative mb-8">
+                            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center text-3xl font-bold text-white shadow-2xl shadow-accent/30 relative z-10 animate-float">Mk</div>
+                            <div class="absolute inset-0 w-20 h-20 rounded-2xl bg-accent/20 blur-2xl animate-pulse-slow"></div>
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2 text-gradient-brand">MKCode</h1>
+                        <p class="text-muted mb-10">AI-powered agent platform</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+                            <button class="suggestion-card" @click="selectSuggestion('Build a React todo app with dark mode and local storage')">
+                                <div class="w-9 h-9 rounded-xl bg-accent-subtle flex items-center justify-center mb-3">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                </div>
+                                <span class="text-sm font-medium">Build a React app</span>
+                                <span class="text-xs text-muted mt-1">With dark mode & persistence</span>
+                            </button>
+                            <button class="suggestion-card" @click="selectSuggestion('Latest AI agent frameworks 2026')">
+                                <div class="w-9 h-9 rounded-xl bg-accent-subtle flex items-center justify-center mb-3">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                                </div>
+                                <span class="text-sm font-medium">Research AI frameworks</span>
+                                <span class="text-xs text-muted mt-1">Latest trends & comparisons</span>
+                            </button>
+                            <button class="suggestion-card" @click="selectSuggestion('Create a FastAPI backend with async endpoints')">
+                                <div class="w-9 h-9 rounded-xl bg-accent-subtle flex items-center justify-center mb-3">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                </div>
+                                <span class="text-sm font-medium">FastAPI backend</span>
+                                <span class="text-xs text-muted mt-1">Async endpoints & best practices</span>
+                            </button>
+                            <button class="suggestion-card" @click="selectSuggestion('Explain and implement quicksort')">
+                                <div class="w-9 h-9 rounded-xl bg-accent-subtle flex items-center justify-center mb-3">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                </div>
+                                <span class="text-sm font-medium">Algorithm</span>
+                                <span class="text-xs text-muted mt-1">Quicksort explained & coded</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Message List -->
+                    <template x-for="(msg, i) in messages" :key="msg.id">
+                        <div class="mb-6 last:mb-0 msg-enter" :style="`--delay: ${i * 0.05}s`">
+                            <div class="flex gap-3 items-start w-full" :class="msg.role === 'user' ? 'flex-row-reverse' : ''">
+                                <!-- Avatar -->
+                                <div class="w-8 h-8 rounded-xl shrink-0 mt-0.5 flex items-center justify-center text-xs font-bold shadow-sm"
+                                     :class="msg.role === 'user'
+                                        ? 'bg-gradient-to-br from-accent to-accent-dark text-white shadow-accent/20'
+                                        : 'bg-accent-subtle text-accent border border-accent/20'"
+                                     x-text="msg.role === 'user' ? 'U' : 'Mk'"></div>
+
+                                <!-- Content -->
+                                <div class="min-w-0 max-w-[88%] sm:max-w-[80%]"
+                                     :class="msg.role === 'user' ? '' : 'w-full'">
+
+                                    <!-- Thinking (active) -->
+                                    <template x-if="msg.role === 'assistant' && i === messages.length - 1">
+                                        <div>
+                                            <div x-show="isThinking && thinkingContent" class="thinking-block mb-3">
+                                                <div class="thinking-header">
+                                                    <div class="flex items-center gap-2.5 flex-1">
+                                                        <div class="flex gap-1">
+                                                            <span class="w-2 h-2 rounded-full bg-accent/60 animate-think-dot"></span>
+                                                            <span class="w-2 h-2 rounded-full bg-accent/60 animate-think-dot" style="animation-delay:0.15s"></span>
+                                                            <span class="w-2 h-2 rounded-full bg-accent/60 animate-think-dot" style="animation-delay:0.3s"></span>
+                                                        </div>
+                                                        <span class="text-xs font-medium text-accent">Thinking</span>
+                                                        <span class="text-xs text-muted animate-pulse">...</span>
+                                                    </div>
+                                                    <button @click="thinkingOpen = !thinkingOpen" class="text-muted hover:text-primary transition-colors">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                                    </button>
                                                 </div>
-                                                <span class="text-xs font-medium text-[#8B5CF6]">Thinking</span>
-                                                <span class="thinking-fast ml-0.5">...</span>
+                                                <div x-show="thinkingOpen" x-collapse.duration.200ms>
+                                                    <div class="thinking-content text-sm" x-text="thinkingContent"></div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div x-show="thinkingOpen" x-collapse.duration.200ms>
-                                            <div class="thinking-content scrollbar-thin" x-text="thinkingContent"></div>
-                                        </div>
-                                    </div>
 
-                                    <div x-show="thinkingDone && thinkingContent && msg.content" class="mb-2">
-                                        <button @click="thinkingOpen = !thinkingOpen" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#888] hover:text-[#8B5CF6] transition-colors cursor-pointer">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                                            <span x-text="thinkingOpen ? 'Hide thinking' : 'Show thinking'"></span>
-                                        </button>
-                                        <div x-show="thinkingOpen" x-collapse.duration.200ms class="mt-1.5">
-                                            <div class="thinking-block">
-                                                <div class="thinking-content max-h-48 scrollbar-thin" x-text="thinkingContent"></div>
+                                            <div x-show="thinkingDone && thinkingContent && msg.content" class="mb-2">
+                                                <button @click="thinkingOpen = !thinkingOpen" class="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none px-3 py-1.5 rounded-lg hover:bg-accent-subtle">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                                    <span x-text="thinkingOpen ? 'Hide thinking' : 'Show thinking'"></span>
+                                                </button>
+                                                <div x-show="thinkingOpen" x-collapse.duration.200ms class="mt-1.5">
+                                                    <div class="thinking-block">
+                                                        <div class="thinking-content max-h-48 text-sm" x-text="thinkingContent"></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- Final Version -->
-                                <div x-show="msg.role === 'assistant' && i === messages.length - 1 && thinkingDone && msg.content" class="final-version-label mb-2">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                    Final Version
-                                </div>
-
-                                <!-- User bubble -->
-                                <div x-show="msg.role === 'user'"
-                                     class="chat-bubble-user text-sm leading-relaxed">
-                                    <div class="message-content" x-html="formatContent(msg.content)"></div>
-                                </div>
-
-                                <!-- Assistant response -->
-                                <div x-show="msg.role === 'assistant'"
-                                     class="chat-bubble-ai text-sm leading-relaxed">
-                                    <div class="message-content" x-html="formatContent(msg.content)"></div>
-
-                                    <!-- Source chips -->
-                                    <template x-if="msg.sources && msg.sources.length > 0">
-                                        <div class="mt-3 flex flex-wrap gap-1.5">
-                                            <template x-for="(src, si) in msg.sources.slice(0, 4)" :key="si">
-                                                <a :href="src.url" target="_blank" rel="noopener noreferrer"
-                                                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F8F6FF] border border-[#E5E5E5] text-[#888] hover:bg-[#F3EEFF] hover:border-[#8B5CF6]/30 hover:text-[#8B5CF6] transition-all">
-                                                    <img :src="'https://www.google.com/s2/favicons?domain=' + getDomain(src.url) + '&sz=32'" class="w-3.5 h-3.5 rounded" loading="lazy" @error="$el.style.display='none'" :alt="getDomain(src.url)">
-                                                    <span class="truncate max-w-[100px]" x-text="getDomain(src.url)"></span>
-                                                </a>
-                                            </template>
-                                            <button x-show="msg.sources.length > 4"
-                                                    @click="openSources(msg.sources)"
-                                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F3EEFF] border border-[#8B5CF6]/20 text-[#8B5CF6] hover:bg-[#F0ECFF] transition-all">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                                +<span x-text="msg.sources.length - 4"></span> more
-                                            </button>
                                         </div>
                                     </template>
 
-                                    <!-- Action buttons -->
-                                    <div x-show="msg.role === 'assistant' && msg.content && !(i === messages.length - 1 && streaming)"
-                                         class="mt-3 flex items-center gap-0.5 -ml-1.5">
-                                        <button @click="toggleLike(i)" class="p-1.5 rounded-lg transition-all"
-                                                :class="msg.liked ? 'text-[#8B5CF6] bg-[#F3EEFF]' : 'text-[#888] hover:text-[#444] hover:bg-gray-100'">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-                                        </button>
-                                        <button @click="toggleDislike(i)" class="p-1.5 rounded-lg transition-all"
-                                                :class="msg.disliked ? 'text-[#DC2626] bg-[#FEF2F2]' : 'text-[#888] hover:text-[#444] hover:bg-gray-100'">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z"/><line x1="17" y1="2" x2="20" y2="2"/></svg>
-                                        </button>
-                                        <button @click="regenerateLast()" class="p-1.5 rounded-lg text-[#888] hover:text-[#444] hover:bg-gray-100 transition-all">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                                        </button>
-                                        <button @click="retryLast()" class="p-1.5 rounded-lg text-[#888] hover:text-[#8B5CF6] hover:bg-[#F3EEFF] transition-all" title="Retry">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-                                        </button>
-                                        <button x-show="msg.sources && msg.sources.length > 0" @click="openSources(msg.sources)" class="p-1.5 rounded-lg text-[#888] hover:text-[#8B5CF6] hover:bg-[#F3EEFF] transition-all">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                        </button>
+                                    <!-- Final Version Label -->
+                                    <div x-show="msg.role === 'assistant' && i === messages.length - 1 && thinkingDone && msg.content" class="final-badge mb-2">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                        Response
+                                    </div>
+
+                                    <!-- User Bubble -->
+                                    <div x-show="msg.role === 'user'" class="user-bubble text-sm leading-relaxed">
+                                        <div class="message-content" x-html="formatContent(msg.content)"></div>
+                                    </div>
+
+                                    <!-- Assistant Bubble -->
+                                    <div x-show="msg.role === 'assistant'" class="assistant-bubble text-sm leading-relaxed">
+                                        <div class="message-content" x-html="formatContent(msg.content)"></div>
+
+                                        <!-- Sources -->
+                                        <template x-if="msg.sources && msg.sources.length > 0">
+                                            <div class="mt-4 flex flex-wrap gap-2">
+                                                <template x-for="(src, si) in msg.sources.slice(0, 4)" :key="si">
+                                                    <a :href="src.url" target="_blank" rel="noopener noreferrer"
+                                                       class="source-chip">
+                                                        <img :src="'https://www.google.com/s2/favicons?domain=' + getDomain(src.url) + '&sz=32'" class="w-4 h-4 rounded" loading="lazy" @error="$el.style.display='none'" :alt="getDomain(src.url)">
+                                                        <span class="truncate max-w-[120px]" x-text="getDomain(src.url)"></span>
+                                                    </a>
+                                                </template>
+                                                <button x-show="msg.sources.length > 4"
+                                                        @click="openSources(msg.sources)"
+                                                        class="source-chip-more">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                                    +<span x-text="msg.sources.length - 4"></span>
+                                                </button>
+                                            </div>
+                                        </template>
+
+                                        <!-- Actions -->
+                                        <div x-show="msg.role === 'assistant' && msg.content && !(i === messages.length - 1 && streaming)"
+                                             class="mt-3 flex items-center gap-1 message-actions">
+                                            <button @click="toggleLike(i)" class="action-btn" :class="msg.liked ? 'active-like' : ''">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                                            </button>
+                                            <button @click="toggleDislike(i)" class="action-btn" :class="msg.disliked ? 'active-dislike' : ''">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z"/><line x1="17" y1="2" x2="20" y2="2"/></svg>
+                                            </button>
+                                            <button @click="regenerateLast()" class="action-btn">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                                            </button>
+                                            <button @click="retryLast()" class="action-btn" title="Retry">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                            </button>
+                                            <button x-show="msg.sources && msg.sources.length > 0" @click="openSources(msg.sources)" class="action-btn">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </template>
+                    </template>
 
-                <!-- Searching indicator -->
-                <div x-show="isSearching" class="flex gap-3 mb-5">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center text-xs font-semibold text-white shadow-sm shrink-0">Mk</div>
-                    <div class="flex items-center gap-2.5 pt-1">
-                        <div class="search-spinner">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round">
-                                <circle cx="11" cy="11" r="8" stroke-dasharray="32" stroke-dashoffset="32" class="spinner-circle"/>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65" class="spinner-handle"/>
-                            </svg>
-                        </div>
-                        <span class="text-sm text-[#888] font-medium">Searching the web...</span>
-                        <div class="thinking-dots">
-                            <span class="thinking-dot"></span>
-                            <span class="thinking-dot"></span>
-                            <span class="thinking-dot"></span>
+                    <!-- Searching -->
+                    <div x-show="isSearching" class="flex gap-3 mb-6 msg-enter">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center text-xs font-bold text-white shadow-sm shrink-0">Mk</div>
+                        <div class="flex items-center gap-3 pt-1">
+                            <div class="relative flex items-center justify-center w-5 h-5">
+                                <svg class="animate-search-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-accent">
+                                    <circle cx="11" cy="11" r="8" stroke-dasharray="32" stroke-dashoffset="32"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-secondary font-medium">Searching the web</span>
+                            <div class="flex gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-accent/60 animate-bounce" style="animation-delay:0s"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-accent/60 animate-bounce" style="animation-delay:0.15s"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-accent/60 animate-bounce" style="animation-delay:0.3s"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Typing -->
-                <div x-show="streaming && !isThinking && !isSearching" class="flex gap-3 mb-5">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center text-xs font-semibold text-white shadow-sm shrink-0">Mk</div>
-                    <div class="flex gap-1.5 items-center pt-2.5">
-                        <span class="w-2 h-2 rounded-full bg-[#8B5CF6]/40 animate-bounce" style="animation-delay:0ms"></span>
-                        <span class="w-2 h-2 rounded-full bg-[#8B5CF6]/40 animate-bounce" style="animation-delay:150ms"></span>
-                        <span class="w-2 h-2 rounded-full bg-[#8B5CF6]/40 animate-bounce" style="animation-delay:300ms"></span>
+                    <!-- Typing -->
+                    <div x-show="streaming && !isThinking && !isSearching" class="flex gap-3 mb-6 msg-enter">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center text-xs font-bold text-white shadow-sm shrink-0">Mk</div>
+                        <div class="flex items-center gap-1.5 pt-2">
+                            <span class="w-2 h-2 rounded-full bg-accent/50 animate-bounce" style="animation-delay:0s"></span>
+                            <span class="w-2 h-2 rounded-full bg-accent/50 animate-bounce" style="animation-delay:0.15s"></span>
+                            <span class="w-2 h-2 rounded-full bg-accent/50 animate-bounce" style="animation-delay:0.3s"></span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Input -->
-        <div class="border-t border-[#E5E5E5]/50 bg-white/40 backdrop-blur-md px-3 sm:px-4 pb-4 pt-3 shrink-0">
-            <div class="max-w-3xl mx-auto">
-                <div class="flex items-center gap-2 mb-2.5 px-1">
-                    <button class="tool-toggle" :class="{ 'active': searchEnabled }" @click="searchEnabled = !searchEnabled">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        Search
-                    </button>
-                    <button class="tool-toggle" :class="{ 'active': agentsEnabled }" @click="agentsEnabled = !agentsEnabled">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 0-4 4v2h8V6a4 4 0 0 0-4-4z"/><path d="M16 8v2a4 4 0 0 1-8 0V8"/><path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z"/></svg>
-                        Agents
-                    </button>
-                    <div class="flex-1"></div>
-                    <span class="text-[10px] text-[#888]" x-show="!streaming && currentChatId">Shift+Enter for new line</span>
+            <!-- Input -->
+            <div class="border-t border-border/50 bg-surface/60 backdrop-blur-xl px-3 sm:px-4 pb-4 pt-3 shrink-0">
+                <div class="max-w-3xl mx-auto">
+                    <div class="flex items-center gap-2 mb-2.5 px-1">
+                        <button class="toggle-btn" :class="{ 'active': searchEnabled }" @click="searchEnabled = !searchEnabled">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            Search
+                        </button>
+                        <button class="toggle-btn" :class="{ 'active': agentsEnabled }" @click="agentsEnabled = !agentsEnabled">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 0-4 4v2h8V6a4 4 0 0 0-4-4z"/><path d="M16 8v2a4 4 0 0 1-8 0V8"/><path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z"/></svg>
+                            Agents
+                        </button>
+                        <div class="flex-1"></div>
+                        <span class="text-[11px] text-muted/60" x-show="!streaming && currentChatId">Shift+Enter for new line</span>
+                    </div>
+                    <div class="input-area">
+                        <textarea x-model="input"
+                                  @keydown.enter.prevent="if(!$event.shiftKey) sendMessage()"
+                                  placeholder="Message MKCode..."
+                                  rows="1"
+                                  x-ref="textarea"
+                                  :disabled="streaming"
+                                  class="input-textarea"
+                                  @input="$refs.textarea.style.height = 'auto'; $refs.textarea.style.height = Math.min($refs.textarea.scrollHeight, 192) + 'px'">
+                        </textarea>
+                        <button @click="sendMessage" :disabled="!input.trim() || streaming"
+                                class="send-btn"
+                                :class="input.trim() && !streaming ? 'active' : ''">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-muted/50 text-center mt-2">
+                        MKCode may produce inaccurate information.
+                        <span x-show="searchEnabled" class="text-accent font-medium">· Web search on</span>
+                        <span x-show="agentsEnabled" class="text-accent-light font-medium">· Agents on</span>
+                    </p>
                 </div>
-
-                <div class="flex items-end gap-2 bg-white border border-[#E5E5E5] rounded-2xl px-4 py-3 focus-within:border-[#8B5CF6] focus-within:ring-4 focus-within:ring-[rgba(139,92,246,0.12)] transition-all shadow-sm">
-                    <textarea x-model="input"
-                              @keydown.enter.prevent="if(!$event.shiftKey) sendMessage()"
-                              placeholder="Message MKCode..."
-                              rows="1"
-                              x-ref="textarea"
-                              :disabled="streaming"
-                              class="flex-1 bg-transparent border-none outline-none resize-none text-[15px] text-[#1A1A1A] placeholder-[#BBB] font-sans leading-relaxed max-h-48"
-                              @input="$refs.textarea.style.height = 'auto'; $refs.textarea.style.height = Math.min($refs.textarea.scrollHeight, 192) + 'px'">
-                    </textarea>
-                    <button @click="sendMessage" :disabled="!input.trim() || streaming"
-                            class="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-                            :class="input.trim() && !streaming ? 'bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white shadow-sm shadow-[rgba(139,92,246,0.25)]' : 'bg-[#F3EEFF] text-[#C4B5FD]'">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                    </button>
-                </div>
-                <p class="text-[11px] text-[#BBB] text-center mt-2">
-                    MKCode may produce inaccurate information.
-                    <span x-show="searchEnabled" class="text-[#8B5CF6] font-medium">· Web search on</span>
-                    <span x-show="agentsEnabled" class="text-[#7C3AED] font-medium">· Agents on</span>
-                </p>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
 
-<script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js"></script>
 </body>
 </html>
