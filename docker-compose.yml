@@ -1,0 +1,18 @@
+services:
+  mkcode:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - mkcode_data:/app/data
+    environment:
+      - MKCODE_HOST=0.0.0.0
+      - MKCODE_PORT=8000
+      - MKCODE_DEBUG=false
+      - MKCODE_LOG_LEVEL=INFO
+      - MKCODE_DATABASE_URL=sqlite:///data/mkcode.db
+    restart: unless-stopped
+
+volumes:
+  mkcode_data:

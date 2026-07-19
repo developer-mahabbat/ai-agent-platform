@@ -1,0 +1,8 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "command": {
+    "mkcode": {
+      "description": "Generate full-stack web apps using the MKCode AI Agent Platform."
+    }
+  }
+}

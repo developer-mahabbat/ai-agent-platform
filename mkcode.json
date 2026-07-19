@@ -1,0 +1,16 @@
+{
+    "app_name": "MKCode",
+    "app_version": "1.0.0",
+    "debug": false,
+    "log_level": "INFO",
+    "server_host": "0.0.0.0",
+    "server_port": 8000,
+    "default_provider": "openai",
+    "default_model": "gpt-4o",
+    "temperature": 0.7,
+    "max_tokens": 4096,
+    "rate_limit_per_minute": 60,
+    "telemetry_enabled": false,
+    "memory_enabled": true,
+    "workspace_enabled": true
+}
