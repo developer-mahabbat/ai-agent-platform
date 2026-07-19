@@ -37,7 +37,7 @@
 html, body { height: 100%; overflow: hidden; }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-warm);
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
@@ -146,11 +146,11 @@ body {
     justify-content: center;
     gap: 10px;
     width: 100%;
-    padding: 12px 16px;
+    padding: 11px 16px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg-surface);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
@@ -172,7 +172,7 @@ body {
     padding: 12px 16px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-primary);
     background: var(--bg-surface);
     transition: all 0.2s var(--transition);
@@ -195,7 +195,7 @@ body {
     color: #fff;
     padding: 13px 24px;
     border-radius: var(--radius);
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -243,9 +243,9 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 11px 14px;
+    padding: 10px 14px;
     border-radius: var(--radius);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
     background: var(--bg-warm);
@@ -263,8 +263,8 @@ body {
 .chat-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 8px;
+    padding: 8px 12px;
     border-radius: var(--radius);
     cursor: pointer;
     color: var(--text-muted);
@@ -312,8 +312,8 @@ body {
 .user-bubble {
     background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: #fff;
-    border-radius: 18px 18px 4px 18px;
-    padding: 12px 18px;
+    border-radius: 16px 16px 4px 16px;
+    padding: 10px 16px;
     display: inline-block;
     max-width: 100%;
     box-shadow: 0 2px 8px var(--accent-glow);
@@ -328,10 +328,10 @@ body {
 .source-chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 11px;
+    gap: 5px;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-muted);
     background: var(--bg-surface);
@@ -376,12 +376,12 @@ body {
 }
 
 .action-btn {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-sm);
+    border-radius: 6px;
     color: var(--text-muted);
     background: transparent;
     border: none;
@@ -406,14 +406,14 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 4px 10px;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
     background: var(--accent-bg);
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 /* --- Thinking Block --- */
@@ -427,7 +427,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     cursor: pointer;
     user-select: none;
 }
@@ -436,7 +436,7 @@ body {
 }
 .thinking-content {
     padding: 0 14px 14px;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.6;
     color: var(--text-muted);
     white-space: pre-wrap;
@@ -448,10 +448,10 @@ body {
 .toggle-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    gap: 5px;
+    padding: 5px 10px;
     border-radius: var(--radius-sm);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-muted);
     border: 1px solid var(--border);
@@ -494,18 +494,18 @@ body {
     border: none;
     outline: none;
     resize: none;
-    font-size: 15px;
+    font-size: 13px;
     color: var(--text-primary);
     font-family: inherit;
-    line-height: 1.5;
+    line-height: 1.6;
     max-height: 192px;
 }
 .input-textarea::placeholder { color: var(--text-muted); }
 
 .send-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -541,10 +541,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 14px;
+    padding: 6px 12px;
     background: var(--bg-warm);
     border-bottom: 1px solid var(--border);
-    font-size: 12px;
+    font-size: 11px;
 }
 .code-lang {
     display: flex;
@@ -583,17 +583,18 @@ body {
 .code-block-wrapper pre { margin: 0; overflow-x: auto; }
 .code-block-wrapper pre code {
     display: block;
-    padding: 14px 16px;
-    font-size: 13px;
-    line-height: 1.65;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.6;
     color: #374151;
     font-family: 'JetBrains Mono', monospace;
 }
 
 /* --- Markdown Content --- */
+.message-content { font-size: 13px; line-height: 1.65; }
 .message-content p { margin: 0; min-height: 1.4em; }
-.message-content p + p { margin-top: 0.75em; }
-.message-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.8em; }
+.message-content p + p { margin-top: 0.6em; }
+.message-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.75em; }
 .message-content :not(pre) > code {
     background: var(--accent-bg);
     color: var(--accent-dark);
@@ -627,10 +628,11 @@ body {
         margin-left: -4px;
         margin-right: -4px;
     }
-    .code-block-header { padding: 6px 10px; font-size: 11px; }
-    .code-block-wrapper pre code { padding: 10px 12px; font-size: 12px; }
-    .thinking-content { max-height: 200px; font-size: 12px; }
-    .auth-card { padding: 32px 24px; }
-    .user-bubble { max-width: 95%; }
-    .suggestion-card { padding: 14px; }
+    .code-block-header { padding: 5px 10px; font-size: 10px; }
+    .code-block-wrapper pre code { padding: 10px 12px; font-size: 11px; }
+    .thinking-content { max-height: 200px; font-size: 11px; }
+    .auth-card { padding: 28px 20px; }
+    .user-bubble { max-width: 95%; font-size: 12px; }
+    .suggestion-card { padding: 12px; }
+    .message-content { font-size: 12px; }
 }

@@ -344,6 +344,18 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
+        retryMessage(msgIdx) {
+            const msgs = this.messages.slice(0, msgIdx);
+            const lastUserIdx = msgs.map(m => m.role).lastIndexOf('user');
+            if (lastUserIdx === -1) return;
+            const lastUserMsg = msgs[lastUserIdx];
+            this.messages = msgs.slice(0, lastUserIdx);
+            this.$nextTick(() => {
+                this.input = lastUserMsg.content;
+                this.sendMessage();
+            });
+        },
+
         regenerateLast() {
             const lastUserIdx = this.messages.map(m => m.role).lastIndexOf('user');
             if (lastUserIdx === -1) return;
